@@ -27,7 +27,9 @@ const router = createBrowserRouter([
     path: "/profile",
     Component: ProfilePage,
   },
-]);
+], {
+  basename: "/Spatial-Art-prototype-",
+});
 
 export default function App() {
   return (
