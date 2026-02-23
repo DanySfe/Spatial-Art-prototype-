@@ -1,15 +1,18 @@
-<<<<<<< HEAD
+# Spatial Art Prototype
 
-  # Asset Inventory for WebAR
+This is a code bundle for the Spatial Art project.
 
-  This is a code bundle for Asset Inventory for WebAR. The original project is available at https://www.figma.com/design/CAv21JtOcHhmp5Qh95AIzN/Asset-Inventory-for-WebAR.
+## Running the code
 
-  ## Running the code
-
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
-=======
-# Spatial-Art-prototype-
->>>>>>> 02e005fd9b1fea5263921a93c7ff8ff88d306195
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
+3. Build for production:
+   ```bash
+   npm run build
+   ```
