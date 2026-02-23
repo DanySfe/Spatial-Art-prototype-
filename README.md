@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
   # Asset Inventory for WebAR
 
@@ -9,3 +10,6 @@
 
   Run `npm run dev` to start the development server.
   
+=======
+# Spatial-Art-prototype-
+>>>>>>> 02e005fd9b1fea5263921a93c7ff8ff88d306195
