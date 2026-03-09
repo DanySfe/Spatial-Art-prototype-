@@ -4,34 +4,42 @@ export interface Artwork {
   artist: string;
   price: string;
   image: string;
+  images?: string[];
   status: string;
   category: string;
   year: string;
   description?: string;
+  modelSrc?: string;
+  iosSrc?: string;
 }
 
 export const artworksData: Artwork[] = [
   {
     id: '1',
-    title: 'Venus de Milo',
-    artist: 'Alexandros of Antioch',
-    price: '$12,500',
-    image: 'https://images.unsplash.com/photo-1769765745515-cb004c7fb2ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjbGFzc2ljYWwlMjBzY3VscHR1cmUlMjBtdXNldW18ZW58MXx8fHwxNzcxMTM2MzU3fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    title: 'Mona Lisa',
+    artist: 'Leonardo da Vinci',
+    price: '$860,000,000',
+    image: '/Spatial-Art-prototype-/monalisa_1.jpg',
+    images: ['/Spatial-Art-prototype-/monalisa_1.jpg', '/Spatial-Art-prototype-/Monalisa_pic_2.png'],
     status: 'AR Ready',
-    category: 'Sculpture',
-    year: '130 BC',
-    description: 'Ancient Greek sculpture depicting the goddess Aphrodite',
+    category: 'Painting',
+    year: '1503',
+    description: 'A portrait of Lisa Gherardini, wife of Francesco del Giocondo, famously known for her enigmatic smile.',
+    modelSrc: '/Spatial-Art-prototype-/monalisa_4.glb',
+    iosSrc: '/Spatial-Art-prototype-/monalisa_4.usdz'
   },
   {
     id: '2',
-    title: 'Abstract Composition',
-    artist: 'Unknown Contemporary',
-    price: '$3,200',
-    image: 'https://images.unsplash.com/photo-1703936205356-11814e31bfda?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMHBhaW50aW5nJTIwbW9kZXJuJTIwYXJ0fGVufDF8fHx8MTc3MTE3NjQzOHww&ixlib=rb-4.1.0&q=80&w=1080',
-    status: 'New',
-    category: 'Painting',
-    year: '2024',
-    description: 'Contemporary abstract piece with vibrant colors',
+    title: 'The Thinker',
+    artist: 'Auguste Rodin',
+    price: '$15,300,000',
+    image: '/Spatial-Art-prototype-/the_thinker_image.jfif',
+    status: 'AR Ready',
+    category: 'Sculpture',
+    year: '1904',
+    description: 'A bronze sculpture by Auguste Rodin, usually placed on a stone pedestal. The work shows a nude male figure of over life-size sitting on a rock with his chin resting on one hand as though deep in thought.',
+    modelSrc: '/Spatial-Art-prototype-/the_thinker_by_auguste_rodin.glb',
+    iosSrc: '/Spatial-Art-prototype-/the_thinker_by_auguste_rodin.usdz'
   },
   {
     id: '3',

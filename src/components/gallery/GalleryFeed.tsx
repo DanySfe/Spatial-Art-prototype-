@@ -26,7 +26,7 @@ export default function GalleryFeed() {
     <div className="min-h-screen bg-gradient-to-br from-[#1A1613] via-[#2A2420] to-[#1A1613] pb-20">
       {/* Header */}
       <header className="bg-gradient-to-b from-black/40 to-transparent backdrop-blur-sm sticky top-0 z-40 border-b border-white/5">
-        <div className="px-4 py-5">
+        <div className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl text-white mb-1" style={{ fontFamily: 'Georgia, serif' }}>Spatial Gallery</h1>
@@ -54,7 +54,7 @@ export default function GalleryFeed() {
       </header>
 
       {/* Featured Hero Section */}
-      <div className="px-4 pt-6 pb-5">
+      <div className="max-w-7xl mx-auto px-4 pt-6 pb-5">
         <Link to={`/artwork/${featuredArtwork.id}`} className="block group">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#C2A572]/20 to-transparent border border-white/10 backdrop-blur-sm">
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10"></div>
@@ -90,7 +90,7 @@ export default function GalleryFeed() {
       </div>
 
       {/* Categories */}
-      <div className="px-4 pb-6">
+      <div className="max-w-7xl mx-auto px-4 pb-6">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button className="px-4 py-2 bg-[#C2A572] text-black text-xs font-medium whitespace-nowrap rounded-full">
             All Artworks
@@ -108,7 +108,7 @@ export default function GalleryFeed() {
       </div>
 
       {/* Grid Title */}
-      <div className="px-4 pb-4">
+      <div className="max-w-7xl mx-auto px-4 pb-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg text-white" style={{ fontFamily: 'Georgia, serif' }}>Collection</h3>
           <button 
@@ -124,8 +124,8 @@ export default function GalleryFeed() {
       </div>
 
       {/* Artworks Grid */}
-      <div className="px-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {displayedArtworks.map((artwork) => (
             <Link 
               key={artwork.id} 
@@ -198,7 +198,7 @@ export default function GalleryFeed() {
       </div>
 
       {/* Load More */}
-      <div className="px-6 pt-6 pb-4">
+      <div className="max-w-7xl mx-auto px-6 pt-6 pb-4">
         {hasMore ? (
           <button 
             onClick={() => setDisplayCount(prev => prev + 6)}

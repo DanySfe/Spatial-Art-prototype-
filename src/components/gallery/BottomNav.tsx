@@ -54,7 +54,7 @@ export default function BottomNav() {
       {/* Glassmorphic container with elegant border */}
       <div className="bg-gradient-to-t from-[#1A1613]/95 to-[#2A2420]/95 backdrop-blur-2xl border-t border-white/10 shadow-2xl shadow-black/50">
         {/* Active indicator track */}
-        <div className="relative">
+        <div className="md:max-w-md mx-auto relative">
           <div className="flex justify-around items-center px-4 py-2 pb-safe">
             {navItems.map((item) => {
               const active = isActive(item.path);

@@ -10,6 +10,7 @@ export default function ArtworkDetail() {
   const { isSaved, toggleSave, collections, addToCollection } = useGallery();
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [showLearnMore, setShowLearnMore] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const modelViewerRef = useRef<HTMLElement & { activateAR?: () => void }>(null);
 
   const artwork = getArtworkById(id || '1');
@@ -17,6 +18,11 @@ export default function ArtworkDetail() {
   if (!artwork) {
     return <div>Artwork not found</div>;
   }
+
+  const images = artwork.images || [artwork.image];
+
+  const nextImage = () => setActiveImageIndex((prev) => (prev + 1) % images.length);
+  const prevImage = () => setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
 
   const handleAddToCollection = (collectionId: string) => {
     addToCollection(artwork.id, collectionId);
@@ -32,28 +38,73 @@ export default function ArtworkDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1A19] relative overflow-hidden">
-      {/* Full-screen 3D Viewer Area */}
-      <div className="absolute inset-0">
+    <div className="min-h-screen bg-[#1A1A19] relative overflow-hidden flex flex-col lg:flex-row lg:items-center lg:justify-center">
+      {/* Background & 3D Viewer Area - Desktop: Left Column, Mobile: Absolute Fill */}
+      <div className="absolute inset-0 z-0 lg:static lg:flex-1 lg:h-[100dvh] lg:relative flex flex-col items-center justify-center lg:w-auto overflow-hidden">
+        {/* Dark overlay for better text contrast - Hidden on Desktop */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A19] via-[#1A1A19]/60 to-black/80 pointer-events-none lg:hidden"></div>
+
+        {/* Hidden model-viewer just for AR activation */}
         <model-viewer
           ref={modelViewerRef}
-          src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-          ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
-          alt="A 3D model of an astronaut"
+          src={artwork.modelSrc || "https://modelviewer.dev/shared-assets/models/Astronaut.glb"}
+          {...(artwork.iosSrc ? { "ios-src": artwork.iosSrc } : (!artwork.modelSrc ? { "ios-src": "https://modelviewer.dev/shared-assets/models/Astronaut.usdz" } : {}))}
+          alt={artwork.title}
           ar
           ar-modes="scene-viewer webxr quick-look"
-          camera-controls
-          auto-rotate
-          shadow-intensity="1"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }}
         ></model-viewer>
-        {/* Dark overlay for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none"></div>
+
+        {/* Unified Responsive Image Display */}
+        <div className="w-full h-full flex items-center justify-center p-6 lg:p-0 pointer-events-none group">
+          {/* Image & Controls Wrapper */}
+          <div className="relative inline-block max-h-full max-w-full">
+            <ImageWithFallback
+              src={images[activeImageIndex]}
+              alt={artwork.title}
+              className="max-w-full max-h-[85vh] lg:rounded-xl object-contain pointer-events-auto transition-all duration-300 relative z-10"
+            />
+            
+            {images.length > 1 && (
+              <>
+                {/* Carousel Arrows */}
+                <button 
+                  onClick={prevImage} 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)] pointer-events-auto transition-all"
+                >
+                  <svg className="w-8 h-8 lg:w-12 lg:h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button 
+                  onClick={nextImage} 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] hover:drop-shadow-[0_0_12px_rgba(255,255,255,1)] pointer-events-auto transition-all"
+                >
+                  <svg className="w-8 h-8 lg:w-12 lg:h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
+
+                {/* Dot Indicators */}
+                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-2 lg:gap-3 pointer-events-auto bg-black/20 backdrop-blur-md px-3 lg:px-4 py-1.5 lg:py-2 rounded-full border border-white/10 z-20">
+                  {images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`transition-all rounded-full ${
+                        idx === activeImageIndex 
+                          ? 'w-4 lg:w-6 h-1.5 bg-white' 
+                          : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'
+                      }`}
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Top Bar with Save & Share */}
-      <div className="absolute top-0 left-0 right-0 z-30">
-        <div className="flex items-center justify-between p-4">
+      {/* Top Bar with Save & Share (Mobile Only) */}
+      <div className="absolute top-0 left-0 right-0 z-30 lg:hidden">
+        <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
           <button
             onClick={() => navigate('/')}
             className="w-9 h-9 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors"
@@ -87,99 +138,109 @@ export default function ArtworkDetail() {
         </div>
       </div>
 
-      {/* AR Mode Indicator */}
-      <div className="absolute top-20 left-4 z-30">
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-full flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-white text-xs">3D View Active</span>
-        </div>
-      </div>
+      {/* AR Mode Indicator (Removed since we don't have a 3D preview mode anymore) */}
 
-      {/* Bottom Content Area */}
-      <div className="absolute bottom-0 left-0 right-0 z-40 pb-6">
-        {/* Primary Action Button - View in Your Space */}
-        <div className="px-4 mb-4">
-          <button
-            onClick={() => modelViewerRef.current?.activateAR?.()}
-            className="w-full bg-[#C2A572] hover:bg-[#B39562] text-white py-4 rounded-full text-sm uppercase tracking-wider transition-colors shadow-xl flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-            View in Your Space
-          </button>
-        </div>
+      {/* Details/Action Panel Area - Desktop: Right Column, Mobile: Absolute Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-40 pb-6 pointer-events-none lg:relative lg:inset-auto lg:bottom-auto lg:left-auto lg:right-auto lg:pb-0 lg:w-[480px] lg:flex-shrink-0 lg:h-[100dvh] lg:flex lg:flex-col lg:bg-white lg:border-l lg:border-gray-200 lg:shadow-[-20px_0_50px_rgba(0,0,0,0.05)] lg:overflow-y-auto custom-scrollbar">
+        <div className="md:max-w-2xl mx-auto pointer-events-auto lg:w-full lg:max-w-none lg:h-full lg:flex lg:flex-col">
+          
+        {/* Details Panel */}
+        <div className="mx-4 lg:mx-0 lg:flex-1 lg:flex lg:flex-col lg:min-h-full lg:pt-14">
+          <div className="bg-white/95 backdrop-blur-md rounded-lg border border-[#E5E4E0] shadow-2xl lg:shadow-none overflow-hidden lg:rounded-none lg:border-none flex flex-col h-full">
+            <div className="p-5 lg:p-10 flex-1 flex flex-col">
+              <button 
+                onClick={() => navigate('/')}
+                className="hidden lg:flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#1A1A19] transition-colors mb-8 group w-fit"
+              >
+                <svg className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to Gallery
+              </button>
 
-        {/* Floating Info Panel */}
-        <div className="mx-4">
-          <div className="bg-white/95 backdrop-blur-md rounded-lg border border-[#E5E4E0] shadow-2xl overflow-hidden">
-            <div className="p-5">
               {/* Title & Price */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1 pr-4">
-                  <h1 className="text-xl mb-1 leading-tight" style={{ fontFamily: 'Georgia, serif' }}>
-                    {artwork.title}
-                  </h1>
-                  <p className="text-sm text-[#9B9B98]">{artwork.artist}, {artwork.year}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-xl text-[#1A1A19]" style={{ fontFamily: 'Georgia, serif' }}>
-                    {artwork.price}
+              <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1 pr-4">
+                    <h1 className="text-3xl font-bold font-serif text-[#1A1A19] mb-1">{artwork.title}</h1>
+                    <p className="text-sm text-gray-500 font-medium">
+                      {artwork.artist}, {artwork.year}
+                    </p>
+                  </div>
+                  <div className="text-right mt-1">
+                    <span className="text-lg font-medium text-[#1A1A19] block">{artwork.price}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Specs Grid */}
-              <div className="grid grid-cols-2 gap-3 py-3 border-t border-[#E5E4E0]">
-                <div>
-                  <div className="text-[10px] text-[#9B9B98] uppercase tracking-wider mb-1">Materials</div>
-                  <div className="text-xs text-[#3A3A38]">{artworkDetails.materials}</div>
+                {/* Museum Label Metadata (2-Column Grid) */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 my-2 border-y border-gray-100">
+                  <div>
+                    <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Materials</h3>
+                    <p className="text-xs text-[#1A1A19] font-medium leading-relaxed">{artworkDetails.materials}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Dimensions</h3>
+                    <p className="text-xs text-[#1A1A19] font-medium leading-relaxed">{artworkDetails.dimensions}</p>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[10px] text-[#9B9B98] uppercase tracking-wider mb-1">Dimensions</div>
-                  <div className="text-xs text-[#3A3A38]">{artworkDetails.dimensions}</div>
-                </div>
-              </div>
 
-              {/* Description */}
-              <div className="pt-3 border-t border-[#E5E4E0]">
-                <p className="text-xs text-[#3A3A38] leading-relaxed">
+                {/* Description */}
+                <p className="text-sm text-gray-600 leading-relaxed mb-6">
                   {artwork.description}
                 </p>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 mt-4 pt-4 border-t border-[#E5E4E0]">
+                {/* Primary Action Button - View in Your Space */}
                 <button
+                  onClick={() => {
+                    const modelViewer = modelViewerRef.current;
+                    if (modelViewer && modelViewer.activateAR) {
+                      modelViewer.activateAR();
+                    }
+                  }}
+                  className="w-full bg-[#C6A87C] hover:bg-[#B59870] text-[#1A1A19] py-3.5 px-6 rounded-lg font-medium tracking-wide transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 mb-4"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 8V5a2 2 0 0 1 2-2h3"></path>
+                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"></path>
+                    <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    <path d="M21 16v3a2 2 0 0 1-2 2h-3"></path>
+                    <path d="M12 11v6"></path>
+                    <path d="M9 14l3-3 3 3"></path>
+                  </svg>
+                  VIEW IN YOUR SPACE
+                </button>
+              {/* Secondary Actions Row */}
+              <div className="flex gap-2.5 mt-auto pt-6 lg:pb-10">
+                <button 
                   onClick={() => setShowCollectionModal(true)}
-                  className="flex-1 px-4 py-3 bg-[#1A1A19] text-white text-xs uppercase tracking-wider hover:bg-[#3A3A38] transition-colors rounded"
+                  className="flex-1 bg-[#1A1A19] hover:bg-black text-white py-3.5 px-4 rounded-md text-xs font-medium tracking-wider uppercase transition-colors"
                 >
                   Add to Collection
                 </button>
-                <button
+                <button 
                   onClick={() => setShowLearnMore(true)}
-                  className="flex-1 px-4 py-3 border-2 border-[#1A1A19] text-[#1A1A19] text-xs uppercase tracking-wider hover:bg-[#F8F8F6] transition-colors rounded"
+                  className="flex-1 bg-transparent border border-[#E5E4E0] hover:bg-gray-50 text-[#1A1A19] py-3.5 px-4 rounded-md text-xs font-medium tracking-wider uppercase transition-colors"
                 >
                   Learn More
                 </button>
               </div>
             </div>
 
-            {/* AR Badge */}
-            <div className="bg-green-50 border-t border-green-200 px-5 py-2 flex items-center justify-center gap-2">
+            {/* AR viewing indicator (docked to bottom of scrollable area) */}
+            <div className="bg-green-50 border-t border-green-200 px-5 py-3 flex items-center justify-center gap-2 mt-auto shrink-0">
               <svg className="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-xs text-green-800">AR viewing available for this piece</span>
+              <span className="text-xs font-medium text-green-800">AR viewing available for this piece</span>
             </div>
           </div>
         </div>
 
-        {/* Interaction Hint */}
-        <div className="text-center mt-4">
+        {/* Interaction Hint (Mobile Only - Hidden on Desktop Sidebar) */}
+        <div className="text-center mt-4 lg:hidden">
           <p className="text-xs text-white/70">
             Pinch to zoom • Drag to rotate
           </p>
+        </div>
         </div>
       </div>
 
